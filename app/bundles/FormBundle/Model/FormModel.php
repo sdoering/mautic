@@ -23,6 +23,7 @@ use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -84,6 +85,8 @@ class FormModel extends CommonFormModel
      */
     private $columnSchemaHelper;
 
+    private PrimaryCompanyHelper $primaryCompanyHelper;
+
     /**
      * @var TableSchemaHelper
      */
@@ -106,7 +109,8 @@ class FormModel extends CommonFormModel
         ContactTracker $contactTracker,
         ColumnSchemaHelper $columnSchemaHelper,
         TableSchemaHelper $tableSchemaHelper,
-        MappedObjectCollectorInterface $mappedObjectCollector
+        MappedObjectCollectorInterface $mappedObjectCollector,
+        PrimaryCompanyHelper $primaryCompanyHelper
     ) {
         $this->requestStack          = $requestStack;
         $this->templatingHelper      = $templatingHelper;
@@ -120,6 +124,7 @@ class FormModel extends CommonFormModel
         $this->columnSchemaHelper    = $columnSchemaHelper;
         $this->tableSchemaHelper     = $tableSchemaHelper;
         $this->mappedObjectCollector = $mappedObjectCollector;
+        $this->primaryCompanyHelper   = $primaryCompanyHelper;
     }
 
     /**
@@ -532,6 +537,7 @@ class FormModel extends CommonFormModel
         $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];
         $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         [$pages, $lastPage] = $this->getPages($fields);
+        $profileFields      = $lead instanceof Lead && $lead->getId() ? $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
         $html               = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.twig',
             [
@@ -543,6 +549,7 @@ class FormModel extends CommonFormModel
                 'theme'          => $theme,
                 'submissions'    => $submissions,
                 'lead'           => $lead,
+                'profileFields'  => $profileFields,
                 'formPages'      => $pages,
                 'lastFormPage'   => $lastPage,
                 'style'          => $style,

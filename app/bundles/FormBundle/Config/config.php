@@ -194,6 +194,7 @@ return [
                     'mautic.schema.helper.column',
                     'mautic.schema.helper.table',
                     'mautic.form.collector.mapped.object',
+                    'mautic.lead.helper.primary_company',
                 ],
             ],
             'mautic.form.model.submission' => [

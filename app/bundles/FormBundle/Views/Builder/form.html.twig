@@ -35,6 +35,7 @@
         <div class="mauticform-error" id="mauticform{{ formName }}_error"></div>
         <div class="mauticform-message" id="mauticform{{ formName }}_message"></div>
         <div class="mauticform-innerform">
+            {% set profileFields = profileFields|default([]) %}
             {# @var \Mautic\FormBundle\Entity\Field $f #}
             {%- for fieldId, f in fields -%}
               {%- if formPages['open'][fieldId] is defined -%}
@@ -42,7 +43,7 @@
                   {%- set lastFieldAttribute = lastFormPage == fieldId ? 'data-mautic-form-pagebreak-lastpage="true"' : '' -%}
                   <div class="mauticform-page-wrapper mauticform-page-{{ pageCount }}" data-mautic-form-page="{{ pageCount }}" {{ lastFieldAttribute }}>
               {%- endif -%}
-              {%- if not f.parent and f.showForContact(submissions, lead, form, displayManager) -%}
+              {%- if not f.parent and f.showForContact(submissions, lead, form, displayManager, profileFields) -%}
                   {%- if f.isCustom -%}
                       {%- set params = fieldSettings[f.type] -%}
                       {%- do f.setCustomParameters(params) -%}
@@ -52,9 +53,9 @@
                             not f.isAlwaysDisplay and
                             not f.showWhenValueExists and
                             f.mappedField is not empty and
-                            'contact' is same as f.mappedObject and
+                            f.mappedObject in ["contact", "company"] and
                             f.isAutoFill and
-                            (lead is defined and lead is not empty and lead.getFieldValue(f.mappedField) is not empty)
+                            (lead is defined and lead is not empty and profileFields[f.mappedObject] is defined and profileFields[f.mappedObject] is not empty)
                       -%}
                           {%- do f.setType('hidden') -%}
                       {%- else -%}

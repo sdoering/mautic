@@ -376,8 +376,9 @@ class SubmissionModel extends CommonFormModel
             $leadSubmissions = $this->formModel->getLeadSubmissions($form, $lead->getId());
 
             $displayManager = new DisplayManager($form, $this->formModel->getCustomComponents()['viewOnlyFields']);
+            $profileFields  = $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
             foreach ($fields as $field) {
-                if ($field->showForContact($leadSubmissions, $lead, $form, $displayManager)) {
+                if ($field->showForContact($leadSubmissions, $lead, $form, $displayManager, $profileFields)) {
                     $displayManager->increaseDisplayedFields($field);
                 } elseif (isset($validationErrors[$field->getAlias()])) {
                     unset($validationErrors[$field->getAlias()]);

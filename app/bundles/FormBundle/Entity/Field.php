@@ -814,7 +814,7 @@ class Field
      *
      * @return bool
      */
-    public function showForContact($submissions = null, Lead $lead = null, Form $form = null, DisplayManager $displayManager = null)
+    public function showForContact($submissions = null, Lead $lead = null, Form $form = null, DisplayManager $displayManager = null, array $profileFields = [])
     {
         // Always show in the kiosk mode
         if (null !== $form && true === $form->getInKioskMode()) {
@@ -840,7 +840,7 @@ class Field
             if (null !== $lead
                 && $this->mappedField
                 && 'contact' === $this->mappedObject
-                && !empty($lead->getFieldValue($this->mappedField))
+                && !empty($profileFields[$this->mappedObject])
                 && !$this->isAutoFill
             ) {
                 return false;
